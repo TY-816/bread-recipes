@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我的私人麵包配方室</title>
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, "Noto Sans TC", sans-serif;
+    background: #f7f3ec;
+    color: #302d28;
+  }
+  main {
+    max-width: 600px;
+    margin: 8vh auto;
+    padding: 20px;
+  }
+  .panel {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 6px 24px #00000012;
+  }
+  h1 { font-size: 28px; }
+  p { line-height: 1.8; }
+  label {
+    display: block;
+    background: #315c48;
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 24px;
+  }
+  input { display: none; }
+  small { color: #777; }
+  #viewer {
+    display: none;
+    border: 0;
+    width: 100%;
+    height: 100dvh;
+  }
+  #back {
+    display: none;
+    margin: 12px;
+    padding: 10px;
+  }
+</style>
+</head>
+<body>
+<main id="home">
+  <div class="panel">
+    <p>🍞 私人烘焙工具</p>
+    <h1>我的麵包配方室</h1>
+    <p>
+      選擇保存在自己手機裡的食譜 HTML，
+      即可查看食材、製作步驟，
+      並依照想製作的數量自動換算比例。
+    </p>
+
+    <label for="recipe">
+      選擇私人食譜檔案
+    </label>
+    <input type="file" id="recipe" accept=".html,.htm">
+
+    <p><small>
+      食譜只在你的裝置內讀取，
+      不會上傳到 GitHub。
+    </small></p>
+    <p id="error" style="color:#b33"></p>
+  </div>
+</main>
+
+<button id="back" onclick="location.reload()">
+  更換食譜
+</button>
+
+<iframe id="viewer"
+  sandbox="allow-scripts allow-downloads allow-modals">
+</iframe>
+
+<script>
+document.getElementById("recipe")
+.addEventListener("change", async function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  if (!/\.html?$/i.test(file.name)) {
+    document.getElementById("error").textContent =
+      "請選擇 HTML 食譜檔案";
+    return;
+  }
+
+  if (file.size > 15000000) {
+    document.getElementById("error").textContent =
+      "檔案過大，請確認選擇正確的食譜";
+    return;
+  }
+
+  const html = await file.text();
+  if (!/<html[\s>]/i.test(html)) {
+    document.getElementById("error").textContent =
+      "所選檔案不是有效的 HTML";
+    return;
+  }
+
+  document.getElementById("viewer").srcdoc = html;
+  document.getElementById("viewer").style.display = "block";
+  document.getElementById("home").style.display = "none";
+  document.getElementById("back").style.display = "block";
+});
+</script>
+</body>
+</html>
